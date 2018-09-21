@@ -1,0 +1,82 @@
+body {
+  font-family: Arial;
+  background-color: #ececec;
+}
+#dropdownDIV {
+  width: 174px;
+  margin-bottom: 10px;
+}
+.profiles {
+  width: 173px;
+}
+.background {
+  width: 175px;
+  margin: 0 auto;
+}
+#linkList {
+  background-color: #fff;
+}
+.row {
+  padding: 3px;
+}
+.row:nth-child(even) {
+  background-color: #d2d2d2;
+}
+.nonLive:link,
+.nonLive:visited {
+  color: black;
+}
+#loadButtons {
+  text-align: center;
+}
+.live {
+  float: left;
+  padding: 2px;
+  font-size: 10px;
+  border-radius: 4px;
+  border: 0;
+  box-shadow: 2px 2px 1px #5e5e5e;
+  background-color: #9c0000;
+  color: white;
+  margin: 0 10px 0 0;
+}
+.loadAll {
+  float: left;
+  font-size: 8pt;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 0;
+  box-shadow: 2px 2px 1px #ddd;
+  background-color: #252689;
+  color: white;
+  margin-top: 1em;
+}
+.loadAllLive {
+  float: right;
+  font-size: 8pt;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 0;
+  box-shadow: 2px 2px 1px #ddd;
+  background-color: #9c0000;
+  color: white;
+  margin-top: 1em;
+}
+.deleteRowButton {
+  border: transparent;
+  background: transparent;
+  color: #c70000;
+  float: right;
+  font-size: 15px;
+  margin: -2px -5px 0 0;
+}
+.delProfButton {
+  margin: 15px 0 10px 0;
+  font-size: 8pt;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 0;
+  box-shadow: 2px 2px 1px #ddd;
+  background-color: #d20000;
+  color: white;
+}
