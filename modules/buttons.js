@@ -1,22 +1,18 @@
 import {
   $,
-  $c,
-  $t,
   exportProfiles,
-  getProfileNames
+  getProfileNames,
+  deleteIfExists
 } from "./commonFunctions.js";
+import { Element, Button } from "../Classes/Element.js";
 //Delete buttons
-function createDeleteRowButton(savedSearches, profile, row, callback) {
-  let button = $c("BUTTON");
-  let node = $t("x");
-  button.appendChild(node);
-  button.type = "button";
-  button.className = "deleteRowButton";
-  button.addEventListener(
+function createDeleteRowButton(savedSearches, profile, row, linkMgr) {
+  let button = new Button("BUTTON", "", "deleteRowButton", "x", "button");
+  button.listener(
     "click",
-    deleteRow.bind(this, savedSearches, profile, row, callback)
+    deleteRow.bind(this, savedSearches, profile, row, linkMgr)
   );
-  return button;
+  return button.done();
 }
 function deleteRow(savedSearches, profile, row, linkManager) {
   let updatedSearches = Object.assign({}, savedSearches);
@@ -33,57 +29,50 @@ function deleteRow(savedSearches, profile, row, linkManager) {
 }
 
 //Load All buttons
-function createButtons(savedSearches, callback) {
+function createButtons(savedSearches, loadProf, noProf) {
   const profile = savedSearches.lastActive;
   let contentBG = $("contentBG");
-  let buttonDIV = $("loadButtons");
-  if (buttonDIV) {
-    contentBG.removeChild(buttonDIV);
-  }
-  buttonDIV = $c("DIV");
-  buttonDIV.id = "loadButtons";
+  deleteIfExists("loadButtons");
+  let buttonDIV = new Element("DIV", "loadButtons");
   //** Stole from function above.  Could be re-written to only be used once.
   //** I wanted to get this running, leave me alone
   if (savedSearches[profile] && savedSearches[profile][0].link) {
     //Load All & Load Live buttons
     let button = createLoadAllButton(savedSearches, profile);
     let liveButton = createLoadAllButton(savedSearches, profile, 1);
-    buttonDIV.appendChild(button);
-    buttonDIV.appendChild(liveButton);
+    buttonDIV.add([button, liveButton]);
   }
   //Delete Profile BUTTON
-  let deleteProfileButton = $c("BUTTON");
-  deleteProfileButton.className = "delProfButton";
-  const nodeDPB = document.createTextNode("Delete Profile");
-  deleteProfileButton.appendChild(nodeDPB);
-  deleteProfileButton.addEventListener(
-    "click",
-    deleteProfile.bind(this, savedSearches, profile, callback)
+  let deleteProfileButton = new Button(
+    "BUTTON",
+    "",
+    "deleteProf",
+    "Delete Profile",
+    "button"
   );
-  buttonDIV.appendChild(deleteProfileButton);
-  contentBG.appendChild(buttonDIV);
+  deleteProfileButton.listener(
+    "click",
+    deleteProfile.bind(this, savedSearches, profile, loadProf, noProf)
+  );
+  buttonDIV.add(deleteProfileButton.done());
+  contentBG.appendChild(buttonDIV.done());
 }
 function createLoadAllButton(savedSearches, profile, live) {
-  let button = $c("button");
-  button.type = "button";
+  let button;
   if (live) {
-    button.className = "loadAllLive";
-    const buttonText = $t("Load All LIVE");
-    button.appendChild(buttonText);
-    button.addEventListener(
+    button = new Button("BUTTON", "", "loadAllLive", "Load All LIVE", "button");
+    button.listener(
       "click",
       loadAllLinks.bind(this, savedSearches, profile, 1)
     );
   } else {
-    button.className = "loadAll";
-    const buttonText = $t("Load All Links");
-    button.appendChild(buttonText);
-    button.addEventListener(
+    button = new Button("BUTTON", "", "loadAll", "Load All Links", "button");
+    button.listener(
       "click",
-      loadAllLinks.bind(this, savedSearches, profile)
+      loadAllLinks.bind(this, savedSearches, profile, 0)
     );
   }
-  return button;
+  return button.done();
 }
 function loadAllLinks(savedSearches, profile, live) {
   savedSearches[profile].forEach(function(linkInfo) {
@@ -92,12 +81,22 @@ function loadAllLinks(savedSearches, profile, live) {
     chrome.tabs.create({ url });
   });
 }
-function deleteProfile(savedSearches, profileToDelete, loadProfiles) {
+function deleteProfile(
+  savedSearches,
+  profileToDelete,
+  loadProfiles,
+  noProfiles
+) {
   let updatedProfs = Object.assign({}, savedSearches);
   delete updatedProfs[profileToDelete];
   updatedProfs.lastActive = getProfileNames(updatedProfs).sort()[0];
-  exportProfiles(updatedProfs);
-  loadProfiles(updatedProfs);
+  if (updatedProfs.lastActive) {
+    exportProfiles(updatedProfs);
+    loadProfiles(updatedProfs);
+  } else {
+    console.log("no");
+    noProfiles({});
+  }
 }
 export {
   createDeleteRowButton,

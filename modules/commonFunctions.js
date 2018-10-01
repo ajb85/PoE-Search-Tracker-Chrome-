@@ -19,4 +19,10 @@ function getProfileNames(savedSearches) {
     .sort();
   return sortedSearches;
 }
-export { $, $c, $t, exportProfiles, getProfileNames };
+function deleteIfExists(elementID, element) {
+  let getEleID = $(elementID);
+  if (getEleID) {
+    getEleID.parentNode.removeChild(getEleID);
+  }
+}
+export { $, $c, $t, exportProfiles, getProfileNames, deleteIfExists };

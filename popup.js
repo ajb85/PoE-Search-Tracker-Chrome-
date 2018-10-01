@@ -1,11 +1,8 @@
-//** File is getting too bulky.  Needs to be broken into pieces.  ie: common functions
-//** like $(x) could be placed in their own file.
 import {
   $,
-  $c,
-  $t,
   exportProfiles,
-  getProfileNames
+  getProfileNames,
+  deleteIfExists
 } from "./modules/commonFunctions.js";
 import { createLinks } from "./modules/linkList.js";
 import {
@@ -14,9 +11,10 @@ import {
   createLoadAllButton,
   loadAllLinks
 } from "./modules/buttons.js";
+import { Element, Option } from "./Classes/Element.js";
 
 fetchData();
-//purgeCloudData();
+//Get data from Chrome storage
 function fetchData() {
   chrome.storage.sync.get(["profiles"], function(obj) {
     if (obj) {
@@ -25,13 +23,18 @@ function fetchData() {
     }
   });
 }
+//If there are no profiles yet (or if they're deleted),
+//User is prompted to input a profile name before continuing
 function checkForNoProfiles(savedSearches) {
   //As long as there is a profile, move on
   if (Object.keys(savedSearches).length) {
     //Profile "input" box
     let profileInputField = $("selectedProfile");
     profileInputField.addEventListener("click", eraseInput);
-    let bindFillEmpty = fillEmptyInput.bind(this, savedSearches.lastActive);
+    //bindFillEmpty saves the state of the listener so it can be
+    //removed later
+    const bindFillEmpty = fillEmptyInput.bind(this, savedSearches.lastActive);
+    //
     profileInputField.addEventListener("blur", bindFillEmpty);
     loadProfiles(savedSearches, bindFillEmpty);
   } else {
@@ -46,24 +49,24 @@ function checkForNoProfiles(savedSearches) {
 }
 //Manages the creation of all the elements in the popup.
 function loadProfiles(savedSearches, bindFillEmpty) {
-  console.log("loadProfiles: ", savedSearches);
   //Parent div for the drop down menu
-  let dropdownDIV = $("dropdownDIV");
-  updateInputField(savedSearches, bindFillEmpty);
+  let divForDD = $("dropdownDIV");
+  updateProfileField(savedSearches, bindFillEmpty);
   //Populates the drop down list
-  let dataListForDropDown = createDataList(savedSearches);
-  dropdownDIV.appendChild(dataListForDropDown);
+  const datalistForDD = createDatalist(savedSearches);
+  divForDD.appendChild(datalistForDD);
   //Populates the links attached to a profile
-  profileLinksManager(savedSearches);
+  populateProfilesLinks(savedSearches);
 }
-//Creates an initial value for the field and its onchange event
-function updateInputField(savedSearches, bindFillEmpty) {
-  console.log("updating Input for: ", savedSearches.lastActive);
+//Creates an initial value for the field and gives its onchange event
+function updateProfileField(savedSearches, bindFillEmpty) {
   let profileInputField = $("selectedProfile");
   //Initial value
   profileInputField.value = savedSearches.lastActive;
 
   profileInputField.onchange = function(event) {
+    //bindFillEmpty is passed around so the listener that deletes the input
+    //when the field is clicked can be removed each this is ran.
     profileInputField.removeEventListener("blur", bindFillEmpty);
     let newActiveProfile = Object.assign({}, savedSearches);
     newActiveProfile.lastActive = event.target.value;
@@ -78,59 +81,40 @@ function updateInputField(savedSearches, bindFillEmpty) {
     }
   };
 }
-function createDataList(savedSearches) {
-  let dropdownDatalist = $("profiles");
-  if (dropdownDatalist) {
-    dropdownDIV.removeChild(dropdownDatalist);
-  }
-  dropdownDatalist = $c("datalist");
-  dropdownDatalist.id = "profiles";
-
+function createDatalist(savedSearches) {
+  deleteIfExists("profiles");
+  let profilesList = new Element("datalist", "profiles");
   //Grab saved profile names and populate dropdown and removes "lastActive"
-  const sortedSearches = getProfileNames(savedSearches);
+  const sortedProfileNames = getProfileNames(savedSearches);
   //Only create links if there are profiles
-  if (sortedSearches && sortedSearches.length) {
-    let options = sortedSearches.forEach(function(profileName) {
-      let option = $c("option");
-      let node = $t(profileName);
-      option.value = profileName;
-      option.appendChild(node);
-      dropdownDatalist.appendChild(option);
+  if (sortedProfileNames && sortedProfileNames.length) {
+    sortedProfileNames.forEach(function(profileName) {
+      const option = new Option("option", "", "", profileName, profileName);
+      profilesList.add(option.done());
     });
-    return dropdownDatalist;
+    return profilesList.done();
   }
 }
 //Populates the links for the active profile
-function profileLinksManager(savedSearches) {
-  let profile = savedSearches.lastActive;
-  console.log("profileLinksManager");
-  //100-107 is just for DOM manipulation
-  //Parent div for profile dataList
-  let listDIV = $("linkList");
-  let nav = $("nav");
-  //Remove any previous links if they exist
-  if (nav) {
-    listDIV.removeChild(nav);
-  }
-  nav = $c("nav");
-  nav.id = "nav";
+function populateProfilesLinks(savedSearches) {
+  const profile = savedSearches.lastActive;
+  let divForLinkList = $("linkList");
+  deleteIfExists("listOfLinks");
+  let listOfLinks = new Element("nav", "listOfLinks");
   if (savedSearches[profile] && savedSearches[profile].length) {
     //Creates and populates the links in a profile if they exist
-    let links = savedSearches[profile].forEach(function(linkInfo, i) {
-      let newDiv = $c("div");
-      newDiv.className = "row";
-      let regLink = createLinks(linkInfo);
-      let liveLink = createLinks(linkInfo, 1);
-      let deleteButton = createDeleteRowButton(
+    savedSearches[profile].forEach(function(linkInfo, i) {
+      let linkRow = new Element("div", "", "row");
+      const regLink = createLinks(linkInfo);
+      const liveLink = createLinks(linkInfo, 1);
+      const deleteButton = createDeleteRowButton(
         savedSearches,
         profile,
         i,
-        profileLinksManager
+        populateProfilesLinks
       );
-      newDiv.appendChild(regLink);
-      newDiv.appendChild(liveLink);
-      newDiv.appendChild(deleteButton);
-      nav.appendChild(newDiv);
+      linkRow.add([regLink, liveLink, deleteButton]);
+      listOfLinks.add(linkRow.done());
     });
   } else if (savedSearches[profile]) {
     console.log(profile, " has no links D:");
@@ -138,21 +122,19 @@ function profileLinksManager(savedSearches) {
     //ruh roh something broke
     console.log("Halp, no profile found in LinkMgmt");
   }
-  listDIV.appendChild(nav);
-  createButtons(savedSearches, loadProfiles);
+  divForLinkList.appendChild(listOfLinks.done());
+  createButtons(savedSearches, loadProfiles, checkForNoProfiles);
 }
 function eraseInput(event) {
   event.target.value = "";
 }
 function fillEmptyInput(lastActive) {
-  console.log("Filling empty input: ", lastActive);
   let profileField = $("selectedProfile");
   if (profileField.value === "") {
     profileField.value = lastActive;
   }
 }
 function createNewProfile(savedSearches, newProfile, bindFillEmpty) {
-  console.log("New profile: ", newProfile);
   let addNewProfile = Object.assign({}, savedSearches);
   addNewProfile[newProfile] = [
     { name: "Add New Links!", link: "http://poe.trade", starter: 1 }
@@ -164,13 +146,4 @@ function createNewProfile(savedSearches, newProfile, bindFillEmpty) {
 
 function purgeCloudData() {
   exportProfiles({});
-}
-function deleteIfExists(elementID, element) {
-  let getEleID = $(elementID);
-  let parent = getEleID.parentNode;
-  if (getEleID) {
-    parent.removeChild(getEleID);
-  }
-  getEleID = $c(element);
-  return getEleID;
 }

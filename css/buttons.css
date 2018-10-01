@@ -1,16 +1,153 @@
+.save,
+.search {
+  font-size: 8pt;
+  width: 40px;
+  height: 25px;
+}
 .save {
   background-color: #7c7c7c;
-  font-size: 8pt;
-  width: 70px;
   position: fixed;
+  font-size: 8pt;
+  top: 25px;
+  right: 0px;
+  padding: 0px;
+}
+.search {
+  background-color: #7c7c7c;
+  position: fixed;
+  font-size: 8pt;
   top: 0px;
   right: 0px;
+  padding: 0px;
 }
-.newSearch {
-  background-color: #7c7c7c;
-  width: 80px;
-  font-size: 8pt;
+.savePopUp {
+  display: block;
+  background-color: #111;
+  padding: 20px;
+  width: 447.11px;
   position: fixed;
-  top: 0px;
-  right: 70px;
+  top: 200px;
+  left: 50%;
+  margin-left: -150px;
+  z-index: 10;
+  border: 1px solid black;
+  border-radius: 25px;
+  box-shadow: 4px 7px #767676;
+}
+.savePopUp h2 {
+  text-align: center;
+}
+.dropdownDIV {
+  width: 160px;
+  position: relative;
+  display: inline-block;
+}
+.ddButton {
+  background-color: #333;
+  width: 160px;
+  color: #fff;
+  padding: 0px;
+  height: 32px;
+  font-size: 16px;
+  margin: 0 0 10px 0px;
+  border: none;
+  text-align: center;
+  line-height: 32px;
+}
+.ddButton:hover,
+.ddButton:focus {
+  background-color: #222;
+}
+.ddMenu {
+  margin-left: 0px;
+  margin-top: -8px;
+  display: none;
+  position: absolute;
+  background-color: #333;
+  min-width: 160px;
+  text-align: center;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+.ddMenu p {
+  color: #fff;
+  font-weight: 700;
+  padding: 5px 0 5px 0;
+  text-decoration: none;
+  display: block;
+}
+.ddMenu p:hover {
+  background-color: #222;
+}
+.show {
+  display: block;
+}
+.ddLink {
+  padding: 3px;
+  margin: 0px;
+  font-size: 12pt;
+}
+.titleText {
+  color: #af6025;
+  font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+  font-weight: bold;
+}
+.profile {
+  position: relative;
+  margin-right: 150px;
+}
+.updateInput {
+  background-color: #333;
+  color: #fff;
+  height: 32px;
+  font-size: 16px;
+  max-width: 200px;
+  font-weight: 500;
+  margin: 0 0 0 45.11px;
+}
+.updateInput option {
+  padding: 5px;
+}
+.updateInput:nth-child(odd) {
+  background-color: #111;
+}
+.nameText {
+  display: block;
+}
+.newName {
+  float: left;
+  background-color: #222;
+  color: #fff;
+  height: 32px;
+  padding: 0;
+  font-size: 16px;
+  max-width: 200px;
+  font-weight: 500;
+}
+.popUpButtons {
+  height: 32px;
+  width: 75px;
+  border: transparent;
+  color: #fff;
+  padding: 5px;
+}
+.saveButtonPU {
+  margin-left: 40px;
+  background-color: #e18181;
+}
+.saveButtonPU:hover {
+  background-color: #8b0000;
+}
+.cancelButtonPU {
+  margin-left: 15px;
+  background-color: #7c7c7c;
+}
+.cancelButtonPU:hover {
+  background-color: #444;
+}
+.badInput {
+  box-shadow: 0 0 5px red;
+  padding: 3px 0px 3px 3px;
+  margin: 5px 1px 3px 0px;
+  border: 1px solid red;
 }

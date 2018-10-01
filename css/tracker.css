@@ -69,8 +69,9 @@ body {
   float: right;
   font-size: 15px;
   margin: -2px -5px 0 0;
+  cursor: pointer;
 }
-.delProfButton {
+.deleteProf {
   margin: 15px 0 10px 0;
   font-size: 8pt;
   padding: 6px 10px;

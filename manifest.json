@@ -1,6 +1,6 @@
 {
   "name": "PoE Search Tracker",
-  "version": "1.0",
+  "version": "1.6",
   "description": "Save and organize searches from poe.trade",
   "permissions": ["activeTab", "storage", "tabs"],
 
@@ -14,18 +14,12 @@
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "images/get_started16.png",
-      "32": "images/get_started32.png",
-      "48": "images/get_started48.png",
-      "128": "images/get_started128.png"
+      "16": "images/logo16.png",
+      "32": "images/logo32.png",
+      "48": "images/logo48.png",
+      "128": "images/logo128.png"
     }
   },
-  "options_page": "options.html",
-  "icons": {
-    "16": "images/get_started16.png",
-    "32": "images/get_started32.png",
-    "48": "images/get_started48.png",
-    "128": "images/get_started128.png"
-  },
+
   "manifest_version": 2
 }
